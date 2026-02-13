@@ -50,6 +50,13 @@ extension WhatsNewView: View {
     /// The content and behavior of the view.
     public var body: some View {
         self.contentView
+        .overlay(
+            alignment: .topTrailing
+        ) {
+            self.closeButton
+                .padding(.top, 16)
+                .padding(.trailing, 20)
+        }
         .sheet(
             item: self.$secondaryActionPresentedView,
             content: { $0.view }
@@ -67,6 +74,23 @@ extension WhatsNewView: View {
 // MARK: - ContentView
 
 private extension WhatsNewView {
+    
+    /// The close button that performs the primary dismiss action.
+    var closeButton: some View {
+        Button(
+            action: self.performPrimaryDismissAction
+        ) {
+            Image(systemName: "xmark")
+                .font(.headline.weight(.semibold))
+                .foregroundColor(.secondary)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        #if os(macOS)
+        .buttonStyle(PlainButtonStyle())
+        #endif
+        .accessibilityLabel("Close")
+    }
     
     /// The WhatsNew content view with platform-specific footer presentation.
     @ViewBuilder
@@ -160,7 +184,15 @@ private extension WhatsNewView {
                     .padding(self.layout.footerVisualEffectViewPadding)
             )
     }
-    
+
+    func performPrimaryDismissAction() {
+        // Invoke HapticFeedback, if available
+        self.whatsNew.primaryAction.hapticFeedback?()
+        // Dismiss
+        self.presentationMode.wrappedValue.dismiss()
+        // Invoke on dismiss, if available
+        self.whatsNew.primaryAction.onDismiss?()
+    }
 }
 
 // MARK: - Title
@@ -259,14 +291,7 @@ private extension WhatsNewView {
             }
             // Primary Action Button
             Button(
-                action: {
-                    // Invoke HapticFeedback, if available
-                    self.whatsNew.primaryAction.hapticFeedback?()
-                    // Dismiss
-                    self.presentationMode.wrappedValue.dismiss()
-                    // Invoke on dismiss, if available
-                    self.whatsNew.primaryAction.onDismiss?()
-                }
+                action: self.performPrimaryDismissAction
             ) {
                 Text(
                     whatsNewText: self.whatsNew.primaryAction.title

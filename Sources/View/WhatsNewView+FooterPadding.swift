@@ -31,14 +31,14 @@ extension WhatsNewView.FooterPadding: ViewModifier {
         content: Content
     ) -> some View {
         #if os(macOS)
-        content.padding(.bottom, 30)
+        content.padding(.bottom, 20)
         #else
         if self.horizontalSizeClass == .regular {
             content.padding(
                 .init(
                     top: 0,
                     leading: 150,
-                    bottom: 50,
+                    bottom: 20,
                     trailing: 150
                 )
             )
@@ -47,7 +47,7 @@ extension WhatsNewView.FooterPadding: ViewModifier {
                 .init(
                     top: 0,
                     leading: 40,
-                    bottom: 35,
+                    bottom: 10,
                     trailing: 40
                 )
             )
@@ -56,7 +56,7 @@ extension WhatsNewView.FooterPadding: ViewModifier {
                 .init(
                     top: 0,
                     leading: 20,
-                    bottom: 80,
+                    bottom: 10,
                     trailing: 20
                 )
             )

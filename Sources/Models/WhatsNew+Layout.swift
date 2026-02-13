@@ -66,7 +66,7 @@ public extension WhatsNew {
         ///   - footerVisualEffectViewPadding: The footer visual effect view padding. Default value `top: -10`
         public init(
             showsScrollViewIndicators: Bool = false,
-            scrollViewBottomContentInset: CGFloat = 150,
+            scrollViewBottomContentInset: CGFloat = 20,
             contentSpacing: CGFloat = 60,
             contentPadding: EdgeInsets = .init(top: 65, leading: 0, bottom: 0, trailing: 0),
             featureListSpacing: CGFloat = 25,

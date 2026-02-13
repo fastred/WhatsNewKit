@@ -49,61 +49,7 @@ extension WhatsNewView: View {
     
     /// The content and behavior of the view.
     public var body: some View {
-        ZStack {
-            // Content ScrollView
-            ScrollView(
-                .vertical,
-                showsIndicators: self.layout.showsScrollViewIndicators
-            ) {
-                // Content Stack
-                VStack(
-                    spacing: self.layout.contentSpacing
-                ) {
-                    // Title
-                    self.title
-                    // Feature List
-                    VStack(
-                        alignment: .leading,
-                        spacing: self.layout.featureListSpacing
-                    ) {
-                        // Feature
-                        ForEach(
-                            self.whatsNew.features,
-                            id: \.self,
-                            content: self.feature
-                        )
-                    }
-                    .modifier(FeaturesPadding())
-                    .padding(self.layout.featureListPadding)
-                }
-                .padding(.horizontal)
-                .padding(self.layout.contentPadding)
-                // ScrollView bottom content inset
-                Color.clear
-                    .padding(
-                        .bottom,
-                        self.layout.scrollViewBottomContentInset
-                    )
-            }
-            #if os(iOS)
-            .alwaysBounceVertical(false)
-            #endif
-            // Footer
-            VStack {
-                Spacer()
-                self.footer
-                    .modifier(FooterPadding())
-                    #if os(iOS)
-                    .background(
-                        UIVisualEffectView
-                            .Representable()
-                            .edgesIgnoringSafeArea(.horizontal)
-                            .padding(self.layout.footerVisualEffectViewPadding)
-                    )
-                    #endif
-            }
-            .edgesIgnoringSafeArea(.bottom)
-        }
+        self.contentView
         .sheet(
             item: self.$secondaryActionPresentedView,
             content: { $0.view }
@@ -114,6 +60,105 @@ extension WhatsNewView: View {
                 presentedVersion: self.whatsNew.version
             )
         }
+    }
+    
+}
+
+// MARK: - ContentView
+
+private extension WhatsNewView {
+    
+    /// The WhatsNew content view with platform-specific footer presentation.
+    @ViewBuilder
+    var contentView: some View {
+        #if os(iOS)
+        if #available(iOS 26.0, *) {
+            self.scrollView
+                .safeAreaBar(
+                    edge: .bottom,
+                    alignment: .center,
+                    spacing: .zero
+                ) {
+                    self.footerWithPadding
+                }
+        } else if #available(iOS 15.0, *) {
+            self.scrollView
+                .safeAreaInset(
+                    edge: .bottom,
+                    alignment: .center,
+                    spacing: .zero
+                ) {
+                    self.footerWithLegacyBlur
+                }
+        }
+        #else
+        ZStack {
+            self.scrollView
+            VStack {
+                Spacer()
+                self.footerWithPadding
+            }
+            .edgesIgnoringSafeArea(.bottom)
+        }
+        #endif
+    }
+    
+    /// The content ScrollView.
+    var scrollView: some View {
+        ScrollView(
+            .vertical,
+            showsIndicators: self.layout.showsScrollViewIndicators
+        ) {
+            // Content Stack
+            VStack(
+                spacing: self.layout.contentSpacing
+            ) {
+                // Title
+                self.title
+                // Feature List
+                VStack(
+                    alignment: .leading,
+                    spacing: self.layout.featureListSpacing
+                ) {
+                    // Feature
+                    ForEach(
+                        self.whatsNew.features,
+                        id: \.self,
+                        content: self.feature
+                    )
+                }
+                .modifier(FeaturesPadding())
+                .padding(self.layout.featureListPadding)
+            }
+            .padding(.horizontal)
+            .padding(self.layout.contentPadding)
+            // ScrollView bottom content inset
+            Color.clear
+                .padding(
+                    .bottom,
+                    self.layout.scrollViewBottomContentInset
+                )
+        }
+        #if os(iOS)
+        .alwaysBounceVertical(false)
+        #endif
+    }
+    
+    /// The footer with the configured padding modifier.
+    var footerWithPadding: some View {
+        self.footer
+            .modifier(FooterPadding())
+    }
+    
+    /// The footer with legacy visual effect background.
+    var footerWithLegacyBlur: some View {
+        self.footerWithPadding
+            .background(
+                UIVisualEffectView
+                    .Representable()
+                    .edgesIgnoringSafeArea(.horizontal)
+                    .padding(self.layout.footerVisualEffectViewPadding)
+            )
     }
     
 }

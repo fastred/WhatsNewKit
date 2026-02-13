@@ -86,9 +86,7 @@ private extension WhatsNewView {
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
-        #if os(macOS)
-        .buttonStyle(PlainButtonStyle())
-        #endif
+        .buttonStyle(.plain)
         .accessibilityLabel("Close")
     }
     

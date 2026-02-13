@@ -26,28 +26,39 @@ extension WhatsNewView.PrimaryButtonStyle: ButtonStyle {
     func makeBody(
         configuration: Configuration
     ) -> some View {
+        #if os(iOS)
+        let buttonContent = HStack {
+            Spacer()
+            configuration
+                .label
+                .font(.headline.weight(.semibold))
+                .padding(.vertical)
+            Spacer()
+        }
+        .foregroundColor(self.primaryAction.foregroundColor)
+        .background(self.primaryAction.backgroundColor)
+        
+        if #available(iOS 26.0, *) {
+            buttonContent
+                .clipShape(Capsule())
+                .opacity(configuration.isPressed ? 0.5 : 1)
+        } else {
+            buttonContent
+                .cornerRadius(self.layout.footerPrimaryActionButtonCornerRadius)
+                .opacity(configuration.isPressed ? 0.5 : 1)
+        }
+        #else
         Group {
-            #if os(iOS)
-            HStack {
-                Spacer()
-                configuration
-                    .label
-                    .font(.headline.weight(.semibold))
-                    .padding(.vertical)
-                Spacer()
-            }
-            #else
             configuration
                 .label
                 .padding(.horizontal, 60)
                 .padding(.vertical, 8)
-            #endif
         }
         .foregroundColor(self.primaryAction.foregroundColor)
         .background(self.primaryAction.backgroundColor)
         .cornerRadius(self.layout.footerPrimaryActionButtonCornerRadius)
         .opacity(configuration.isPressed ? 0.5 : 1)
+        #endif
     }
     
 }
-
